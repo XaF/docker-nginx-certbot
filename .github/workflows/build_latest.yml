@@ -4,19 +4,33 @@ on:
   push:
     branches:
       - "main"
-      - "master"
     paths:
       - "src/**"
       - ".github/workflows/**"
   pull_request:
     branches:
       - "main"
-      - "master"
     paths:
       - "src/Dockerfile*"
 
 jobs:
+  run_tests:
+    name: run_tests
+    runs-on: ubuntu-latest
+    steps:
+      - name: Setting up Bash Automated Testing System
+        uses: mig4/setup-bats@v1
+        with:
+          bats-version: 1.5.0
+
+      - name: Checkout the repository
+        uses: actions/checkout@v2.4.0
+
+      - name: Running Bash tests
+        run: bats --tap --recursive --timing tests/
+
   docker_buildx_debian:
+    needs: run_tests
     runs-on: ubuntu-latest
     timeout-minutes: 60
     steps:
@@ -48,9 +62,10 @@ jobs:
             linux/arm/v7
           push: ${{ github.event_name != 'pull_request' }}
           build-args: BUILDX_QEMU_ENV=true
-          tags: jonasal/nginx-certbot:latest
+          tags: thexaf/nginx-certbot:latest
 
   docker_buildx_alpine:
+    needs: run_tests
     runs-on: ubuntu-latest
     timeout-minutes: 60
     steps:
@@ -80,4 +95,4 @@ jobs:
             linux/arm64
             linux/arm/v7
           push: ${{ github.event_name != 'pull_request' }}
-          tags: jonasal/nginx-certbot:latest-alpine
+          tags: thexaf/nginx-certbot:latest-alpine

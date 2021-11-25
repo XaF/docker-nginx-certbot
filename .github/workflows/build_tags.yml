@@ -8,7 +8,23 @@ on:
       - "v[1-9].[0-9]+.[0-9]+-nginx[1-9].[0-9]+.[0-9]+"
 
 jobs:
+  run_tests:
+    name: run_tests
+    runs-on: ubuntu-latest
+    steps:
+      - name: Setting up Bash Automated Testing System
+        uses: mig4/setup-bats@v1
+        with:
+          bats-version: 1.5.0
+
+      - name: Checkout the repository
+        uses: actions/checkout@v2.4.0
+
+      - name: Running Bash tests
+        run: bats --tap --recursive --timing tests/
+
   docker_buildx_debian:
+    needs: run_tests
     runs-on: ubuntu-latest
     timeout-minutes: 60
     steps:
@@ -46,12 +62,13 @@ jobs:
           push: true
           build-args: BUILDX_QEMU_ENV=true
           tags: |
-            jonasal/nginx-certbot:${{ steps.tagger.outputs.APP_MAJOR }}
-            jonasal/nginx-certbot:${{ steps.tagger.outputs.APP_MAJOR }}.${{ steps.tagger.outputs.APP_MINOR }}
-            jonasal/nginx-certbot:${{ steps.tagger.outputs.APP_MAJOR }}.${{ steps.tagger.outputs.APP_MINOR }}.${{ steps.tagger.outputs.APP_PATCH }}
-            jonasal/nginx-certbot:${{ steps.tagger.outputs.APP_MAJOR }}.${{ steps.tagger.outputs.APP_MINOR }}.${{ steps.tagger.outputs.APP_PATCH }}-nginx${{ steps.tagger.outputs.NGINX_VERSION }}
+            thexaf/nginx-certbot:${{ steps.tagger.outputs.APP_MAJOR }}
+            thexaf/nginx-certbot:${{ steps.tagger.outputs.APP_MAJOR }}.${{ steps.tagger.outputs.APP_MINOR }}
+            thexaf/nginx-certbot:${{ steps.tagger.outputs.APP_MAJOR }}.${{ steps.tagger.outputs.APP_MINOR }}.${{ steps.tagger.outputs.APP_PATCH }}
+            thexaf/nginx-certbot:${{ steps.tagger.outputs.APP_MAJOR }}.${{ steps.tagger.outputs.APP_MINOR }}.${{ steps.tagger.outputs.APP_PATCH }}-nginx${{ steps.tagger.outputs.NGINX_VERSION }}
 
   docker_buildx_alpine:
+    needs: run_tests
     runs-on: ubuntu-latest
     timeout-minutes: 60
     steps:
@@ -87,13 +104,15 @@ jobs:
           no-cache: true
           push: true
           tags: |
-            jonasal/nginx-certbot:${{ steps.tagger.outputs.APP_MAJOR }}-alpine
-            jonasal/nginx-certbot:${{ steps.tagger.outputs.APP_MAJOR }}.${{ steps.tagger.outputs.APP_MINOR }}-alpine
-            jonasal/nginx-certbot:${{ steps.tagger.outputs.APP_MAJOR }}.${{ steps.tagger.outputs.APP_MINOR }}.${{ steps.tagger.outputs.APP_PATCH }}-alpine
-            jonasal/nginx-certbot:${{ steps.tagger.outputs.APP_MAJOR }}.${{ steps.tagger.outputs.APP_MINOR }}.${{ steps.tagger.outputs.APP_PATCH }}-nginx${{ steps.tagger.outputs.NGINX_VERSION }}-alpine
+            thexaf/nginx-certbot:${{ steps.tagger.outputs.APP_MAJOR }}-alpine
+            thexaf/nginx-certbot:${{ steps.tagger.outputs.APP_MAJOR }}.${{ steps.tagger.outputs.APP_MINOR }}-alpine
+            thexaf/nginx-certbot:${{ steps.tagger.outputs.APP_MAJOR }}.${{ steps.tagger.outputs.APP_MINOR }}.${{ steps.tagger.outputs.APP_PATCH }}-alpine
+            thexaf/nginx-certbot:${{ steps.tagger.outputs.APP_MAJOR }}.${{ steps.tagger.outputs.APP_MINOR }}.${{ steps.tagger.outputs.APP_PATCH }}-nginx${{ steps.tagger.outputs.NGINX_VERSION }}-alpine
 
   update_docker_hub_docs:
-    needs: [docker_buildx_debian, docker_buildx_alpine]
+    needs:
+      - docker_buildx_debian
+      - docker_buildx_alpine
     runs-on: ubuntu-latest
     steps:
       - name: Checkout the repository
@@ -107,5 +126,5 @@ jobs:
         with:
           username: ${{ secrets.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_PASSWORD }}
-          repository: jonasal/nginx-certbot
+          repository: thexaf/nginx-certbot
           readme-filepath: ./tmp.md

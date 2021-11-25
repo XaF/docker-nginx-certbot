@@ -27,7 +27,7 @@ RUN set -ex && \
             build-essential \
             cargo \
             curl \
-            libffi6 \
+            libffi7 \
             libffi-dev \
             libssl-dev \
             openssl \
