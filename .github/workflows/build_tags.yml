@@ -18,7 +18,7 @@ jobs:
           bats-version: 1.5.0
 
       - name: Checkout the repository
-        uses: actions/checkout@v2.4.0
+        uses: actions/checkout@v3.0.2
 
       - name: Running Bash tests
         run: bats --tap --recursive --timing tests/
@@ -29,7 +29,7 @@ jobs:
     timeout-minutes: 60
     steps:
       - name: Checkout the repository
-        uses: actions/checkout@v2.4.0
+        uses: actions/checkout@v3.0.2
 
       - name: Extract version numbers from GitHub reference
         id: tagger
@@ -73,7 +73,7 @@ jobs:
     timeout-minutes: 60
     steps:
       - name: Checkout the repository
-        uses: actions/checkout@v2.4.0
+        uses: actions/checkout@v3.0.2
 
       - name: Extract version numbers from GitHub reference
         id: tagger
@@ -116,7 +116,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout the repository
-        uses: actions/checkout@v2.4.0
+        uses: actions/checkout@v3.0.2
 
       - name: Create Docker Hub documentation
         run: cat docs/dockerhub_tags.md > tmp.md && cat README.md >> tmp.md
