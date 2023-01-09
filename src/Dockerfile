@@ -2,6 +2,7 @@ FROM nginx:1.21.6
 LABEL maintainer="Jonas Alfredsson <jonas.alfredsson@protonmail.com>"
 
 ARG BUILDX_QEMU_ENV
+ARG CRYPTOGRAPHY_DONT_BUILD_RUST=1
 
 ENV CERTBOT_DNS_AUTHENTICATORS \
     cloudflare \
