@@ -122,7 +122,7 @@ jobs:
         run: cat docs/dockerhub_tags.md > tmp.md && cat README.md >> tmp.md
 
       - name: Upload Docker Hub description
-        uses: peter-evans/dockerhub-description@v3.4.1
+        uses: peter-evans/dockerhub-description@v3.4.2
         with:
           username: ${{ secrets.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_PASSWORD }}
